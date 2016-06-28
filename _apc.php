@@ -1,4 +1,5 @@
 <?php
+
 #/ Redirect if not in our IP
 if(in_array($_SERVER['REMOTE_ADDR'], array('server-ip-here', '127.0.0.1'))==false){
 @header("Location: nf.php");
