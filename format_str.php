@@ -22,6 +22,7 @@
  * For this, either Save (in db) as normal and Retrive as utf, -or- Save as utf and Retrive as normal.
  * But DONOT do utf conversion on both sides.
  */
+
 function format_str($in, $max_length=0, $add_space=false, $escape_mysql=false, $utf=false, $rem_inline=true, $all=true)
 {
 	$out = $in;
