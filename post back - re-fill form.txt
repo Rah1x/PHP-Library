@@ -1,0 +1,46 @@
+select - simple
+<?php if(isset($_POST['env_foil_color'])) echo "<script>document.getElementById('env_foil_color').value='{$_POST['env_foil_color']}';</script>"; ?>
+
+Select - when simple is not working
+<?php if(isset($_POST['sistate'])) echo "<script>jQuery(document).ready(function(){document.getElementById('sistate').value='{$_POST['sistate']}';});</script>"; ?>
+
+select toggle - YES/NO (0/1)
+<script>document.getElementById('show_slider').value='<?php if(isset($empt['show_slider'])) echo (int)format_str($empt['show_slider']); else echo '0'; ?>';</script>
+
+
+checkbox
+<?php if(@$empt['is_active']=='1') echo "checked='checked'"; ?>
+or <?php if(isset($_POST['envelope_peel_seel'])  && ($_POST['envelope_peel_seel']=='1')) echo "checked='checked'"; ?>
+
+checkbox - in array
+<?php if(isset($_POST['FamilyEyeR3']) && (in_array('Grandparent', $_POST['FamilyEyeR3']))) echo 'checked="checked"'; ?>
+
+checkbox - with additional work done with on click
+<?php if(@$empt['is_recursive']=='1') echo '<script>$(document).ready(function(){$(\'#is_recursive\').click();});</script>'; ?>
+
+radio
+concept = document.getElementById('form').elements['element'][0].checked='checked';
+<?php if(isset($_POST['inside_select_verse'])){$p_isv=0; if($_POST['inside_select_verse']=='leave_blank'){$p_isv=2;}else if($_POST['inside_select_verse']=='write_my_own'){$p_isv=1;} echo "<script>document.getElementById('card_setup_form').elements['inside_select_verse'][{$p_isv}].checked='checked'; inside_sel('".($p_isv+1)."');</script>";} ?>
+
+radio - method simple
+<?php if(isset($_POST['eyeDiseases1']) && ($_POST['eyeDiseases1']=='Yes')) echo 'checked="checked"'; ?>
+
+radio - using jquery
+<?php $p_ctv=0; $p_ctv2='plain'; if(isset($empt['content_type'])){if($empt['content_type']=='plain'){$p_ctv=0; $p_ctv2='plain';}else if($empt['content_type']=='html'){$p_ctv=1; $p_ctv2='html';}}
+echo "<script>$(document).ready(function(){document.getElementById('f2').elements['content_type'][{$p_ctv}].checked='checked'; $('.content_type')[{$p_ctv}].click();});</script>"; ?>
+
+input fields in array 
+<?php if(isset($_POST['envelope_text']) && (is_array($_POST['envelope_text']))) {foreach($_POST['envelope_text'] as $k=>$v){$v=format_str($v); if(($v!='')&&($v!='-Enter Text-')){echo "<script>document.getElementById('card_setup_form').elements['envelope_text[]'][{$k}].value='{$v}';</script>";}}} ?>
+
+simple input field
+<?php if(isset($_POST['vr_img_selected'])) echo $_POST['vr_img_selected']; ?>
+
+process button
+<?php if(isset($_POST['envelope_text'])) echo "<script>process_studio('envelope');</script>"; ?>
+
+Text Area
+<?php if(isset($_GET['comments'])) echo str_replace("Xnl2nlX", "\n", $_GET['comments']); ?>
+
+Show/Hide div on "Others"
+<?php if(isset($_POST['PRInsured']) && ($_POST['PRInsured']=='other')){}else{echo 'display:none;';} ?>
+

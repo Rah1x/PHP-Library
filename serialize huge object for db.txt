@@ -1,0 +1,2 @@
+base64_encode((gzcompress(serialize($add_to_cart))));
+unserialize(gzuncompress(base64_decode($add_to_cart_ser)));
