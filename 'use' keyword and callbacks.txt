@@ -1,0 +1,20 @@
+<?php
+/** Pass additional params to callback funcs, using the `use` keyword
+*/
+
+
+$cb_pack_filter = function($a) use ($res_1, $cur_pack_id)
+{
+    $curt_pack = @$res_1[$cur_pack_id];
+
+    if($a['id']==$cur_pack_id)
+    return true;
+
+    if($curt_pack['charge_type']=='per_month' && $a['charge_type']=='per_use')
+    return false;
+
+    return false;
+};
+
+$res_1 = array_filter($res_1, $cb_pack_filter);
+var_dumpx($res_1);
