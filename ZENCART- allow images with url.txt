@@ -1,0 +1,34 @@
+file = includes/functions/html_output.php & ADMIN/includes/functions/html_output.php
+function = zen_image
+
+code===
+#/ For image with urls
+    if(stristr($src, 'http://'))
+        $src = substr($src, strripos($src, 'http://'));
+    else if(stristr($src, 'https://'))
+        $src = substr($src, strripos($src, 'https://'));
+===
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+file = ADMIN/includes/functions/general.php
+function = zen_info_image
+
+code===
+#/ For image with urls
+    if(stristr($image, 'http://'))
+        $image = substr($image, strripos($image, 'http://'));
+    else if(stristr($image, 'https://'))
+        $image = substr($image, strripos($image, 'https://'));
+
+    if(stristr($image, 'http://') || stristr($image, 'https://')){
+      $image = zen_image($image, $alt, $width, $height);
+    } else if... //rest same
+
+=====
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX	
+
+[DATABASE]
+{table = manufacturers} update field 'manufacturers_image'. change type to 'longtext'
+{products} update field 'products_image'. change type to 'longtext'
