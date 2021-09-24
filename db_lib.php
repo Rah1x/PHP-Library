@@ -1,10 +1,10 @@
 <?php
 /**
-* MySQL Execution extension
+* MySQLi Execution extension
 * collboration with Shared Memory
 
 * @author Raheel Hasan
-* @version 4.0 (handling pconnection for cron jobs)
+* @version 5.0 (updated to use mysqli, please setup a connection into $mysqli var)
 
 * @param $query = SQL Query
 * @param $type = [single{=multiple columns of a single record}, multi{=multiple records}, save{=insert/delete/update}], default=multi
@@ -12,27 +12,30 @@
 * @param $refresh_cache (default=false) = refresh cache
 
 * @return array
-* Dependency = shared_mem_model.php
 */
 
-$db_conn_res = DB_CONN_RES;
-function mysql_exec($query, $type='', $mem_key='', $refresh_cache=false)
+$db_conn = $mysqli;
+function mysqli_exec($query, $type='', $mem_key='', $refresh_cache=false)
 {
-	$data = $mem_val = '';
+    global $mysqli;
+
+    $data = $mem_val = '';
     $cached=false;
 
-    $db_conn_res = DB_CONN_RES;
-    if(defined('DB_CONN_PERSISTENT'))
-    $db_conn_res = DB_CONN_PERSISTENT;
+    $db_conn = $mysqli;
+    if(defined('DB_CONN_PERSISTENT')){
+    global $mysqliP;
+    $db_conn = $mysqliP;
+    }
 
     ##/ Cache Management
     if(!empty($mem_key))
     {
         if(!function_exists('smem_fetch')){
         @include_once('../includes/shared_mem_model.php');}
-        $cached = is_smem_enabled(); //true or false based on smem is enabled or not
-        //var_dump($cached); die();
+        $cached = is_smem_enabled();
     }
+    //var_dump($cached); die();
 
     if($cached==true)
     {
@@ -53,12 +56,12 @@ function mysql_exec($query, $type='', $mem_key='', $refresh_cache=false)
 
 
     ##/ Perform MYSQL Operations
-    $result = mysql_query($query, $db_conn_res);
+    $result = $db_conn->query($query);
 	if($result!=false)
 	{
         if($type=='single')
 		{
-			$data = mysql_fetch_array($result, MYSQL_ASSOC);
+			$data = $result->fetch_array(MYSQLI_ASSOC);
 		}
         else if($type=='save')
 		{
@@ -66,14 +69,15 @@ function mysql_exec($query, $type='', $mem_key='', $refresh_cache=false)
 		}
 		else
 		{
-			$data = array();
-            while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-			$data[] = $row;
+            $data = array();
+            while($row = $result->fetch_array(MYSQLI_ASSOC)){
+            $data[] = $row;
+            }
 		}
 	}
     else{$data = false;}
+    //var_dump("<pre>", $query, $data, $db_conn->error); exit;
     #-
-
 
     #/ Insert/Update Cache
     if(($cached==true) && empty($mem_val) && ($type!='save')){
@@ -84,7 +88,7 @@ function mysql_exec($query, $type='', $mem_key='', $refresh_cache=false)
 }///////////end function ......
 
 
-///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 
 
 /**
@@ -92,17 +96,13 @@ function mysql_exec($query, $type='', $mem_key='', $refresh_cache=false)
 */
 function get_pconnect()
 {
-    $cn = @mysql_pconnect(DB_HOST, DB_USER, DB_PASS);
-    $db = @mysql_select_db(DB_NAME_T1, $cn);
-
-    define('DB_CONN_PERSISTENT', $cn);
-
-}///////////end function ......
-
+    $mysqliP = new mysqli('p:'.DB['HOST'], DB['USER'], DB['PASS'], DB['NAME']);
+    return $mysqliP;
+}
 
 function close_pconnect()
 {
-    mysql_close(DB_CONN_PERSISTENT);
-
-}///////////end function ......
+    global $mysqliP;
+    $mysqliP->close();
+}
 ?>

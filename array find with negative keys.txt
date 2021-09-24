@@ -1,0 +1,11 @@
+//if key is negaive, loop back. 
+//so -1 = 4
+//-2 = 3
+                        $qtr_range = [
+                        1=>['finan_qtr'=>3, 'months'=>[1, 2, 3]],
+                        2=>['finan_qtr'=>4, 'months'=>[4, 5, 6]],
+                        3=>['finan_qtr'=>1, 'months'=>[7, 8, 9]],
+                        4=>['finan_qtr'=>2, 'months'=>[10, 11, 12]],
+                        ];
+
+                        $rx = current(array_slice(range(1, 4), -3));

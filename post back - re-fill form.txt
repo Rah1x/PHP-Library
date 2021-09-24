@@ -12,6 +12,9 @@ checkbox
 <?php if(@$empt['is_active']=='1') echo "checked='checked'"; ?>
 or <?php if(isset($_POST['envelope_peel_seel'])  && ($_POST['envelope_peel_seel']=='1')) echo "checked='checked'"; ?>
 
+checkbox using jquery
+$('#recur_incident').prop('checked', true);
+
 checkbox - in array
 <?php if(isset($_POST['FamilyEyeR3']) && (in_array('Grandparent', $_POST['FamilyEyeR3']))) echo 'checked="checked"'; ?>
 
@@ -22,7 +25,7 @@ radio
 concept = document.getElementById('form').elements['element'][0].checked='checked';
 <?php if(isset($_POST['inside_select_verse'])){$p_isv=0; if($_POST['inside_select_verse']=='leave_blank'){$p_isv=2;}else if($_POST['inside_select_verse']=='write_my_own'){$p_isv=1;} echo "<script>document.getElementById('card_setup_form').elements['inside_select_verse'][{$p_isv}].checked='checked'; inside_sel('".($p_isv+1)."');</script>";} ?>
 
-radio - method simple
+radio - method simple //may not work
 <?php if(isset($_POST['eyeDiseases1']) && ($_POST['eyeDiseases1']=='Yes')) echo 'checked="checked"'; ?>
 
 radio - using jquery
@@ -33,6 +36,7 @@ input fields in array
 <?php if(isset($_POST['envelope_text']) && (is_array($_POST['envelope_text']))) {foreach($_POST['envelope_text'] as $k=>$v){$v=format_str($v); if(($v!='')&&($v!='-Enter Text-')){echo "<script>document.getElementById('card_setup_form').elements['envelope_text[]'][{$k}].value='{$v}';</script>";}}} ?>
 
 simple input field
+value="<?=@$_POST['email']?>"
 <?php if(isset($_POST['vr_img_selected'])) echo $_POST['vr_img_selected']; ?>
 
 process button

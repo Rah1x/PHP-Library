@@ -1,0 +1,14 @@
+/*
+If you are at shopping-cart.html
+echo '<script>location.replace("'.DOC_ROOT.'shopping-cart.html");</script>';
+will cause load from cache on firefox - when pointing to its own page.
+
+solution:
+*/
+
+@header("location: ".DOC_ROOT."shopping-cart.html");
+echo '<script>location.replace("'.DOC_ROOT.'shopping-cart.html");</script>';
+
+/*
+similar is the case with all javascript location calls: location.href, window.location etc.
+*/

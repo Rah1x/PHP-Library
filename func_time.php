@@ -47,4 +47,47 @@ function time_elapsed_string($ptime, $dir='past')
         }
     }
 }//end func....
+
+
+
+/** $ptime, $ptime2 as epoc timestamps **/
+public static function time_diff_str($ptime, $ptime2)
+{
+
+    $date1 = new \DateTime($ptime);
+    $date2 = new \DateTime($ptime2);
+
+    $interval = $date1->diff($date2);
+    //self::var_dumpx($interval);
+
+    $rtn = [];
+
+    if($interval->y==1)
+    $rtn[]= $interval->y." year";
+    if($interval->y>1)
+    $rtn[]= $interval->y." years";
+
+    if($interval->m==1)
+    $rtn[]= $interval->m." month";
+    if($interval->m>1)
+    $rtn[]= $interval->m." months";
+
+    if($interval->d==1)
+    $rtn[]= $interval->d." day";
+    else if($interval->d>1)
+    $rtn[]= $interval->d." days";
+
+    if($interval->h==1)
+    $rtn[]= $interval->h." hour";
+    if($interval->h>1)
+    $rtn[]= $interval->h." hours";
+
+    if($interval->i==1)
+    $rtn[]= $interval->i." min";
+    if($interval->i>1)
+    $rtn[]= $interval->i." mins";
+
+    return implode(', ', $rtn);
+
+}//end func....
 ?>

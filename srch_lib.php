@@ -3,7 +3,7 @@
 ## Search & Hightlight
 
 ## Author: Raheel Hasan
-## version: 2.6 [Oct 2015]
+## version: 2.8 [Oct 2016]
 
 
 ## USAGE
@@ -95,7 +95,10 @@ class srch_h
         }//end if...
         else
     	{
-    		$srx = array_values(array_unique(array_diff(array_diff(explode(" ",str_replace("&quot;"," ",$srch_it)),array("")),array(" "))));
+    		if($type!='equals')
+            $srx = array_values(array_unique(array_diff(array_diff(explode(" ",str_replace("&quot;"," ",$srch_it)),array("")),array(" "))));
+            else
+            $srx = array_values(array_unique(array_diff(array_diff(array(str_replace("&quot;"," ",$srch_it)),array("")),array(" "))));
     	}
         ##---
 
@@ -107,7 +110,7 @@ class srch_h
         $this->srx = $sr_tempxt;
         }
         else
-        $this->srx = $srx;
+        $this->srx[] = $srx;
         ////
 
 
@@ -227,6 +230,7 @@ class srch_h
         }
 
         ### Highlight Names
+        $srxx = '';
         if(count($srx)>0)
         {
            if(!empty($hightight_key))
@@ -248,13 +252,12 @@ class srch_h
                 $srxx = $srx;
            }
 
+           if(!empty($srxx)){
+
            $s2=implode("<#>", $srxx);
            $s2=str_replace(" ", "<->", $s2);
            $s2=str_replace("<#>" ," ", $s2);
-           //var_dump($name, $s2, '<br />');
-
            $name_x = $this->highlight($name, $s2);
-
 
            ##due to html_entities
            if(strcmp($name_x, $name)==0){
@@ -263,7 +266,10 @@ class srch_h
            $name = $name_x;
            }
            ##--
-        }
+
+           }
+
+        }//end if count..
         ##--
 
         return $name;

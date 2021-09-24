@@ -1,13 +1,5 @@
 <?php
 
-#/ Redirect if not in our IP
-if(in_array($_SERVER['REMOTE_ADDR'], array('server-ip-here', '127.0.0.1'))==false){
-@header("Location: nf.php");
-echo "<script language=\"javascript\">location.href='nf.php';</script>";
-exit;
-}
-//////////////////////////////////////////////////////////
-
 /*
   +----------------------------------------------------------------------+
   | APC                                                                  |
@@ -48,7 +40,7 @@ defaults('USE_AUTHENTICATION',1);			// Use (internal) authentication - best choi
 											//  You need to change ADMIN_PASSWORD to make
 											//  this work!
 defaults('ADMIN_USERNAME','apc'); 			// Admin Username
-defaults('ADMIN_PASSWORD','OhgVHnFDVj');  	// Admin Password - CHANGE THIS TO ENABLE!!!
+defaults('ADMIN_PASSWORD','qqqqqq11');  	// Admin Password - CHANGE THIS TO ENABLE!!!
 
 // (beckerr) I'm using a clear text password here, because I've no good idea how to let
 //           users generate a md5 or crypt password in a easy way to fill it in above

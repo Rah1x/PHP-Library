@@ -2,7 +2,7 @@
 /**
  * Function format_str
  * Formats string and arrays (Please upgrade as per your need)
- * version 6.5
+ * version 6.7 (Jan 2018)
  * Author: Raheel Hasan
 
 
@@ -38,6 +38,20 @@ function format_str($in, $max_length=0, $add_space=false, $escape_mysql=false, $
 
             $v = format_str($v, $max_length, $add_space, $escape_mysql, $utf, $rem_inline, $all);
             $out_x[$k] = $v;
+        }
+        $out = $out_x;
+    }
+    else if(is_object($out))
+    {
+        $out_x = $out; //(object)[];
+        foreach($out as $k=>$v)
+        {
+            $k = strip_tags($k);
+            $k = remove_x($k);
+            $k = format_str($k);
+
+            $v = format_str($v, $max_length, $add_space, $escape_mysql, $utf, $rem_inline, $all);
+            $out_x->$k = $v;
         }
         $out = $out_x;
     }
@@ -106,20 +120,59 @@ function format_str($in, $max_length=0, $add_space=false, $escape_mysql=false, $
 
 
 /**
+ * reverse specifics for json string
+ **/
+function reverse_format_json($in)
+{
+    $out = trim(str_ireplace(['&#x28;', '&#x29;', '&#39;'], ['[', ']', "'"], $in));
+    return $out;
+}//end func.....
+
+function reverse_format_json_ar($in)
+{
+    $out_x = $in;
+    foreach($in as $k=>$v)
+    {
+        $out_x->$k = reverse_format_json($v);
+    }
+
+    return $out_x;
+}//end func.....
+
+/**
  * Function reverse_format
  * reverses '<', '>', '"', "'", '(', ')', '`' to regular
  **/
-function reverse_format($in)
+function reverse_format($in, $single_quoted=false)
 {
     $out = $in;
 
+    if($single_quoted==false)
     $array_s = array('<', '>', '"', "'", '(', ')', '\\');
-    $array_r = array('&lt;', '&gt;', '&#39;', '&quot;', '&#x28;', '&#x29;', '&#92;');
-    $out = str_replace($array_r, $array_s, $out);
+    else
+    $array_s = array('\<', '\>', '\"', "\'", '\(', '\)', '\\\\');
+
+    $array_r = array('&lt;', '&gt;', '&quot;', '&#39;', '&#x28;', '&#x29;', '&#92;');
+    $out = str_ireplace($array_r, $array_s, $out);
 
     $out = trim($out);
     return $out;
 }//end func.....
+
+
+/**
+ * textarea/BR2NL is ruined by Angular, so here we fix it
+**/
+function fix_br2nl($in)
+{
+    $in = nl2br($in);
+    $in = preg_replace('/\s{1,}/ims', ' ', $in);
+    $in = str_ireplace(array('<br />', '<br/>', '<br>'), '\n', $in);
+    $in = str_ireplace('\n ', '\n', $in);
+
+    return $in;
+
+}//end fuinc..
 
 
 /**
@@ -199,16 +252,22 @@ function remove_x($in)
  * Function format_filename
  * Remove all special chars except for allowed chars for filename
  * $in = input string
+ * $add_ts = add timestamp into filename
 **/
-function format_filename($in)
+function format_filename($in, $add_ts=false)
 {
     $out = $in;
 
     $out = remove_x($in); //remove xss
     $out = str_replace(array(' '), '_', $out);
-    $out = preg_replace('/[^a-zA-Z0-9_\-\.]/i', '', $out);
-
+    $out = preg_replace('/[^a-zA-Z0-9_\-\.\[\]]/i', '', $out);
     $out = trim($out);
+
+    if($add_ts!=false)
+    {
+        $out = preg_replace('/(.*?)\.(.+)/i', '$1.'.time().'.$2', $out);
+    }
+
     return $out;
 }//end func.....
 
@@ -216,7 +275,7 @@ function format_filename($in)
 
 /**
  * Function allowed_format
- * reconvert a few items into visible html formatss
+ * reconvert a few items into visible html formats
  * $in = input string
 **/
 function allowed_format($in)
@@ -249,45 +308,80 @@ function allowed_format($in)
  * Function rem_risky_tags
  * Use for sql SAVE/UPDATE only
 **/
-function rem_risky_tags($in, $is_admin=true)
+function rem_risky_tags($in, $is_admin=true, $fix_quote=true)
 {
     $out = $in;
 
     $srch = array(
-    '/<style.*?>.*?(<\/style>){1,}/ims',
-    '/<script.*?>.*?(<\/script>){1,}/ims',
-    '/<iframe.*?>.*?(<\/iframe>){1,}/ims',
-    '/<applet.*?>.*?(<\/applet>){1,}/ims',
-    '/<frame.*?>.*?(<\/frame>){1,}/ims',
-    '/<frameset.*?>.*?(<\/frameset>){1,}/ims',
-    '/<ilayer.*?>.*?(<\/ilayer>){1,}/ims',
-    '/<layer.*?>.*?(<\/layer>){1,}/ims',
-    '/<layer.*?>.*?(<\/layer>){1,}/ims',
-    '/<base.*?>.*?(<\/base>){1,}/ims',
-    '/<code.*?>.*?(<\/code>){1,}/ims',
-    '/<xml.*?>.*?(<\/xml>){1,}/ims',
-    '/<applet.*?>.*?(<\/applet>){1,}/ims',
-    '/<html.*?>.*?(<\/html>){1,}/ims',
-    '/<head.*?>.*?(<\/head>){1,}/ims',
-    '/<meta.*?>.*?(<\/meta>){1,}/ims',
-    '/<body.*?>.*?(<\/body>){1,}/ims'
+    '/<iframe.*?>(.*?<\/iframe.*?>){0,}/ims',
+    '/<style.*?>(.*?<\/style.*?>){0,}/ims',
+    '/<script.*?>(.*?<\/script.*?>){0,}/ims',
+    '/<applet.*?>(.*?<\/applet.*?>){0,}/ims',
+    '/<frame.*?>(.*?<\/frame.*?>){0,}/ims',
+    '/<frameset.*?>(.*?<\/frameset.*?>){0,}/ims',
+    '/<ilayer.*?>(.*?<\/ilayer.*?>){0,}/ims',
+    '/<layer.*?>(.*?<\/layer.*?>){0,}/ims',
+    '/<base.*?>(.*?<\/base.*?>){0,}/ims',
+    '/<code.*?>(.*?<\/code.*?>){0,}/ims',
+    '/<xml.*?>(.*?<\/xml.*?>){0,}/ims',
+    '/<applet.*?>(.*?<\/applet.*?>){0,}/ims',
+    '/<html.*?>(.*?<\/html.*?>){0,}/ims',
+    '/<head.*?>(.*?<\/head.*?>){0,}/ims',
+    '/<meta.*?>(.*?<\/meta.*?>){0,}/ims',
+    '/<body.*?>(.*?<\/body.*?>){0,}/ims'
     );
 
     if($is_admin==false)
     {
         $srch2 = array(
-        '/<embed.*?>.*?(<\/embed>){1,}/ims',
-        '/<object.*?>.*?(<\/object>){1,}/ims',
+        '/<embed.*?>(.*?<\/embed.*?>){0,}/ims',
+        '/<object.*?>(.*?<\/object.*?>){0,}/ims',
         );
 
         $srch = array_merge($srch, $srch2);
     }
 
     $out = preg_replace($srch, '', $out);
+
+    if($fix_quote==true)
     $out = str_replace("'", '&#39;', $out);
+
     $out = trim($out);
 
     return $out;
 
 }//end func.....
+
+
+
+/**
+ * Function format_id
+ * Remove all special chars except for allowed chars for ids
+ * $in = input string
+**/
+function format_id($in)
+{
+    $out = $in;
+
+    $out = remove_x($in); //remove xss
+    $out = str_replace(array(' '), '_', $out);
+    $out = preg_replace('/[^a-zA-Z0-9_]/i', '', $out);
+
+    $out = trim($out);
+    return $out;
+}//end func.....
+
+
+
+/** Format rich text based on suqare tags **/
+function map_square_tags($in)
+{
+    $in = str_ireplace(
+    ['[b]', '[/b]', '[&#92;b]', '[u]', '[/u]', '[&#92;u]', '[h]', '[/h]', '[&#92;h]'],
+    ['<b>', '</b>', '</b>', '<span style="text-decoration:underline;">', '</span>', '</span>', '<span style="background: yellow;">', '</span>', '</span>'],
+    $in
+    );
+
+    return $in;
+}
 ?>

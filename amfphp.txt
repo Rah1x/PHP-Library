@@ -1,0 +1,15 @@
+///////PHP (amfphp>services>testamf.php)
+class testamf{
+function test2()
+{
+	$x="Test";
+	return $x;
+}
+}
+
+//////////////////////////////////////////////////////////
+////////// FLASH
+var netConnection:NetConnection = new NetConnection();
+var responder:Responder = new Responder();
+netConnection.connect("http://localhost/......./Amfphp/gateway.php");
+netConnection.call("testamf/test2", responder);
